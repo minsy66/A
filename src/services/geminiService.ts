@@ -1,9 +1,21 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AssessmentData, FollowUpQuestion, AnalysisResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI() {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not defined. Please set it in the Settings > Secrets panel.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 export async function generateFollowUpQuestions(data: AssessmentData): Promise<FollowUpQuestion[]> {
+  const ai = getAI();
   const prompt = `
     당신은 전문 간호사 및 임상 전문가입니다. 
     다음 환자의 기초 정보, 생체 징후(Vital Signs), 그리고 PQRST 통증 사정 결과를 바탕으로, 
@@ -65,6 +77,7 @@ export async function generateFollowUpQuestions(data: AssessmentData): Promise<F
 }
 
 export async function analyzeFinalAssessment(data: AssessmentData): Promise<AnalysisResult> {
+  const ai = getAI();
   const followUpText = data.followUpAnswers 
     ? Object.entries(data.followUpAnswers).map(([q, a]) => `질문: ${q}, 답변: ${a}`).join("\n")
     : "없음";
