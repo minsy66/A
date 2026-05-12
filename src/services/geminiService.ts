@@ -44,7 +44,7 @@ export async function generateFollowUpQuestions(data: AssessmentData): Promise<F
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -118,7 +118,7 @@ export async function analyzeFinalAssessment(data: AssessmentData): Promise<Anal
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",

@@ -34,6 +34,16 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Cancel any ongoing speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 1.2; // Slightly faster for urgency
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const goToNextStep = async () => {
     if (currentStep === 'intro') setCurrentStep('basicInfo');
     else if (currentStep === 'basicInfo') setCurrentStep('history');
@@ -52,6 +62,8 @@ export default function App() {
       setResult(analysis);
       setIsLoading(false);
       setCurrentStep('result');
+      // Speak the diagnosis for immediate feedback
+      speak(`분석 결과, 의심되는 주 진단은 ${analysis.mainDiagnosis}입니다.`);
     }
   };
 
@@ -651,11 +663,11 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white/70 backdrop-blur-md z-50 flex flex-col items-center justify-center p-6 text-center"
+            className="fixed inset-0 bg-white/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center"
           >
-            <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
-            <h3 className="text-xl font-bold mb-2">AI가 환자 데이터를 사정 중입니다</h3>
-            <p className="text-gray-500 text-sm">임상 데이터베이스와 실시간 매칭하여 감별 진단을 수행하고 있습니다.</p>
+            <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+            <h3 className="text-lg font-bold mb-1">AI 임상 분석 중...</h3>
+            <p className="text-gray-500 text-xs tracking-tight uppercase">데이터베이스 실시간 매칭 중</p>
           </motion.div>
         )}
       </AnimatePresence>
